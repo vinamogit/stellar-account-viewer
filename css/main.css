@@ -1,0 +1,150 @@
+/*
+            Stellar Yolk   #ffa51e
+            Stellar Ochre  #ff5500
+            Stellar Violet #7d00ff
+            Stellar Moss   #00aa46
+            Stellar Coal   #000000
+            Stellar Cloud  #e1e1e1
+        */
+        html, body {
+            height:100%; 
+            font-family: Helvetica, sans-serif;
+
+            /* background-color: #efefef; */
+            /* color: #7d00ff; */
+        }
+
+        
+
+        #wrapper {
+            display: grid;
+            grid-template-columns: 1fr 5fr;
+
+            height: 100%;
+        }
+
+        #side {
+            grid-column: 1 / 2 ;
+
+            display: block;
+            height: 100%;
+            /* background-color: #7d00ff22; */
+            border-right: 2px solid #7d00ff;
+
+            
+        }
+
+        #side h2 {
+            text-align: center;
+            border-bottom: 4px solid #7d00ff;
+        }
+
+        #side h3 {
+            text-align: center;
+            border-bottom: 2px solid #7d00ff;
+        }
+
+        #main {
+            grid-column: 2;
+
+            display: block;
+            height:100%; 
+
+            /*width: 45em; */
+            padding: 10px;
+
+            /* background-color: #ffa51e22; */
+            /* border: 1px solid #ff5500; */
+            /* border-radius: 10px; */
+            /* box-shadow: 0px 1px 1px 1px #ff5500aa; */
+        }
+        #main h2 {
+            border-bottom: 4px solid #ff5500;
+        }
+
+        #main h3 {
+            border-bottom: 2px solid #ff5500;
+        }
+
+        #creation {
+            /* display: block;
+            width: 42em;
+            margin-left: auto;
+            margin-right: auto; */
+            margin-top: 1em;
+        }
+
+        .asset {
+            padding: 12px;
+            margin: 4px;
+            border: 2px solid black;
+            border-radius: 10px;
+            display: block;
+            width: fit-content;
+            float: left;
+            /* background-color: #efefef; */
+            /* border-color: #7d00ff; */
+        }
+
+        .asset-positive {
+            border-color: #00aa46;
+        }
+
+        .asset-image {
+            width: fit-content;
+            float: left;
+        }
+
+        .asset-image img {
+            width: 32px;
+            margin: 2px;
+        }
+
+        h3 img, .asset-img {
+            width: 32px;
+            margin: 2px;
+            vertical-align: middle;
+        }
+
+        .asset-code {
+            font-weight: lighter;
+            /* color: #efefef; */
+        }
+
+        .balance {
+            float: left;
+        }
+
+        
+
+        .ellipsis {
+            text-overflow: ellipsis;
+
+            width: 30%;
+        }
+
+        .menu {
+            display: block;
+            border-left: 5px solid #7d00ff;
+            padding-left: 5px;
+            margin-right: 0;
+            margin-left: 2em;
+            color: #7d00ff;
+            /* text-align: right; */
+            text-decoration: none;
+        }
+
+        .menu:hover {
+            color: #7d00ff;
+            text-decoration: none;
+        }
+
+        .tablecell {
+            display: table-cell;
+            
+        }
+
+        .lighter {
+            font-weight: lighter;
+            font-size: smaller;
+        }

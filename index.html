@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='css/slider.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='css/main.css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-freighter-api/1.1.2/index.min.js"></script>
+    <script src='./js/utils.js'></script>
+    <script src='./js/freighter.js'></script>
+    <script src='./js/fast-toml.js'></script>
+    <script src='./js/chart.min.js'></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="side">
+            <h3>Stellar Account Viewer</h3>
+            <a href="#" class="menu">Balances</a>
+        </div>
+        <div id="main">
+            <button style="vertical-align: bottom; " id="getPublicKey">
+                <img style="width:2em" src="./images/freighter.png" />
+            </button>
+            <span>
+                <input style="height:2em; width: 38em;" type="text" id="publicKey"
+                    placeholder="Paste your G... public key" />
+            </span>
+            <!-- <label class="switch" >
+            <input type="checkbox" id="network">
+            <span class="slider round"></span>
+        </label>
+        <span id="networkName">PUBLIC</span> -->
+            <div id="creation"></div>
+            <div id="balances">
+                <h2>Balances</h2>
+                <div id="balanceWrapper">
+                </div>
+                <div style="clear: both"></div>
+            </div>
+            <!-- <div id="claimablebalances">
+            <h2>Claimable Balances</h2>
+            <div id="claimablebalanceWrapper"></div>
+            <div style="clear: both"></div>
+        </div> -->
+        </div>
+
+    </div>
+</body>
+
+<script src='./js/balance.js'></script>
+
+</html>
