@@ -38,6 +38,21 @@
             <div id="balances">
                 <h2>Balances</h2>
                 <div id="balanceWrapper">
+                    <div id="loading" ></div>
+                    <div class="tablecell" style="text-align:left;vertical-align: middle;">
+                    <table id="nativeBalance" style="text-align:left;vertical-align: middle;" class="tablecell">
+                    </table>
+                    <table id="idTableOthers" style="text-align:left">
+                    </table>
+                </div>
+                    <div class="chart-container tablecell" >
+                        <canvas id="chart" ></canvas>
+                    </div>
+                    <!-- <h3>
+                        <a href="#" onclick="toggleOthers()" style="display:block;text-decoration:none;color:inherit">
+                            <span id="toggle">►</span> Others (<span id="othersCount"></span>)</a>
+                    </h3> -->
+                    
                 </div>
                 <div style="clear: both"></div>
             </div>

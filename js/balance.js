@@ -13,7 +13,7 @@ const urlParams = new URLSearchParams(window.location.search);
 let accountId = urlParams.get('accountId');
 if (accountId) {
     fieldPubKey.value = accountId;
-    this.loadAccount(accountId);
+    loadAccount(accountId);
 }
 
 buttonPubKey.addEventListener('mousedown', async () => {
@@ -60,13 +60,18 @@ function validateAccount(pubKey) {
 
 
 async function loadAccount(pubKey) {
-    divBalances.innerHTML = "Loading...";
+    let loading = document.getElementById("loading");
+    loading.innerHTML = "Loading...";
     divCreation.innerHTML = "";
 
+    let start = new Date();
     if (validateAccount(pubKey)) {
-        loadBalances(pubKey);
+        await loadBalances(pubKey);
     }
+    loading.innerHTML = "";
+    let end = new Date();
 
+    console.log("Loading time: " + ((end - start) / 1000));
 }
 
 async function loadBalances(pubKey) {
@@ -76,7 +81,7 @@ async function loadBalances(pubKey) {
     */
     let response = await fetch("https://horizon.stellar.org/accounts/" + pubKey);
     let data = await response.json();
-    console.log(data)
+    // console.log(data)
 
     var model = {
         creation: {
@@ -84,9 +89,10 @@ async function loadBalances(pubKey) {
             founder: ""
         },
         assets: [],
-        evaluation: 0
+        evaluation: 0,
     };
 
+    var promises = [];
     for (var b of data.balances) {
         let asset = undefined;
         if (b.asset_code) {
@@ -100,17 +106,34 @@ async function loadBalances(pubKey) {
             // model[asset] = [];
         }
 
-        let path = await findBestPath(asset, 1, "EURT:GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S");
-        // let avg = await getAveragePrice( "EURT:GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S");
-        // console.log(avg)
+        /*
+            Estimate the price of the asset with the best price for 1 token. The result is overrated.
+            Note: To be compared with the trade aggregation of the last hour maybe
+        */
+        let path = findBestPath(asset, 1, "EURT:GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S");
+        promises.push(path);
 
         model[asset] = {
             amount: b.balance,
-            price: b.balance * path.amount,
+            price: 0,
             currency: "€"
         };
         model.evaluation += model[asset].price;
     }
+
+    await Promise.all(promises).then((paths) => {
+        for (var p of paths) {
+            if (p.asset.code) {
+                let a = "native";
+                if (p.asset.code != "native") {
+                    a = p.asset.code + ':' + p.asset.issuer;
+                }
+
+                model[a].price = model[a].amount * p.amount;
+                model.evaluation += model[a].price;
+            }
+        }
+    });
 
     response = await fetch("https://horizon.stellar.org/accounts/" + pubKey + '/operations');
     data = await response.json();
@@ -130,18 +153,11 @@ async function loadBalances(pubKey) {
 
 async function drawBalances(model) {
 
-    console.log(model)
+    // console.log(model)
 
     async function draw(asset, code, image, balance) {
 
-        // (async () => {
-
-
-        // })();
-
         let table = "";
-        // table += '<table style="text-align:left">';
-
         table += '<tr>';
         table += '<td rowspan="2">';
         table += '<img class="asset-img" id="' + asset + '"  src="' + image + '" />';
@@ -155,51 +171,37 @@ async function drawBalances(model) {
         table += '<td class="lighter">' + code + '</td>';
         table += '</tr>';
 
-        // table += '</table>';
-
         return table;
     }
 
     var chartData = [];
     var chartLabels = [];
     if (model.native) {
-        let  table = '<table style="text-align:left;vertical-align: middle;" class="tablecell">';
-        table += await draw("XLM", "XLM", "./images/stellar-xlm-logo.png", model.native);
-        table += '</table>';
-        table += '<div class="chart-container tablecell" ><canvas id="chart" ></canvas></div>';
+        let table = await draw("XLM", "XLM", "./images/stellar-xlm-logo.png", model.native);
+        document.getElementById("nativeBalance").innerHTML = table;
 
+        chartLabels.push("XLM");
+        chartData.push(model.native.price);
         for (var asset of model.assets) {
-
-            if (asset == "native") {
-                chartLabels.push("XLM");
-            } else {
+            if (asset != "native") {
                 var a = Utils.splitAsset(asset);
                 chartLabels.push(a.code);
+                chartData.push((model[asset].price));
             }
-
-            // chartData.push((model[asset].price / model.evaluation).toFixed(6));
-            chartData.push((model[asset].price));
         }
-        divBalances.innerHTML = table;
-
     }
 
-    var div = '<div id="idTableOthers" style="display: none;">'
-
-    div += '<table style="text-align:left" >';
+    let tableOthers = "";
     for (var asset of model.assets) {
-
-        var assetObj = Utils.splitAsset(asset);
+        let assetObj = Utils.splitAsset(asset);
         if (assetObj.code != "native") {
-            var asset_issuer = asset.substring(sepIndex + 1);
-            div += await draw(asset, assetObj.code, "./images/generic.png", model[asset]);
+            let asset_issuer = asset.substring(sepIndex + 1);
+            tableOthers += await draw(asset, assetObj.code, "./images/generic.png", model[asset]);
         }
     }
-    div += '</table>';
-    div += '</div>';
-    var othersHeader = '<h3><a href="#" onclick="toggleOthers()" style="display:block;text-decoration:none;color:inherit"><span id="toggle">►</span> Others (' + (model.assets.length - 1) + ')</a></h3>';
 
-    divBalances.innerHTML += othersHeader + div;
+    // document.getElementById("othersCount").innerHTML = (model.assets.length - 1);
+    document.getElementById("idTableOthers").innerHTML = tableOthers;
 
     for (var asset of model.assets) {
 
@@ -228,41 +230,47 @@ async function drawBalances(model) {
     const data = {
         labels: chartLabels,
         datasets: [
-          {
-            label: 'Dataset 1',
-            data: chartData,
-            backgroundColor: [
-                '#4dc9f6',
-                '#f67019',
-                '#f53794',
-                '#537bc4',
-                '#acc236',
-                '#166a8f',
-                '#00a950',
-                '#58595b',
-                '#8549ba'
-              ]
-          }
+            {
+                label: 'Price',
+                data: chartData,
+                backgroundColor: [
+                    '#7d00ff', // Stellar Violet
+                    '#ffa51e', // Stellar Yolk  
+                    '#00aa46', // Stellar Moss  
+                    '#ff5500', // Stellar Ochre 
+                    '#000000', // Stellar Coal  
+                    '#e1e1e1', // Stellar Cloud 
+                    '#4dc9f6',
+                    '#f67019',
+                    '#f53794',
+                    '#537bc4',
+                    '#acc236',
+                    '#166a8f',
+                    '#00a950',
+                    '#58595b',
+                    '#8549ba'
+                ]
+            }
         ]
-      };
+    };
     var ctx = 'chart';
     const config = {
         type: 'doughnut',
         data: data,
         options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top',
-              display: false,
-            },
-            title: {
-              display: true,
-              text: Utils.formatAmount(model.evaluation, 2) + model.native.currency
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: Utils.formatAmount(model.evaluation, 2) + model.native.currency
+                }
             }
-          }
         },
-      };
+    };
     var myChart = new Chart(ctx, config);
 }
 
@@ -329,62 +337,45 @@ async function getAssetImage(code, issuer) {
 }
 
 async function findBestPath(asset, amount, destination = 'native') {
-    console.log("findBestPath " + amount)
     amount = parseFloat(amount).toFixed(7);
+
     var best = {
         amount: 0,
-        path: []
+        path: [],
+        asset: {}
     }
 
     var asset = Utils.splitAsset(asset);
+    let assetParams = "source_asset_type=native";
+    if (asset.code != "native") {
+        let response = await fetch("https://horizon.stellar.org/assets?asset_code=" + asset.code + "&asset_issuer=" + asset.issuer + "&limit=1");
+        let data = await response.json();
+        if (data && data._embedded && data._embedded.records && data._embedded.records.length > 0) {
+
+            var asset_type = data._embedded.records[0].asset_type;
+            assetParams = "source_asset_type=" + asset_type + "&source_asset_code=" + asset.code + "&source_asset_issuer=" + asset.issuer;
+        }
+    }
 
     try {
-        if (asset.code != "native") {
-            let response = await fetch("https://horizon.stellar.org/assets?asset_code=" + asset.code + "&asset_issuer=" + asset.issuer + "&limit=1");
-            let data = await response.json();
-            if (data && data._embedded && data._embedded.records && data._embedded.records.length > 0) {
-                var asset_type = data._embedded.records[0].asset_type;
+        response = await fetch("https://horizon.stellar.org/paths/strict-send?" + assetParams + "&source_amount=" + amount + "&destination_assets=" + destination);
+        data = await response.json();
+        // console.log(data)
 
-                try {
-                    response = await fetch("https://horizon.stellar.org/paths/strict-send?source_asset_type=" + asset_type + "&source_asset_code=" + asset.code + "&source_asset_issuer=" + asset.issuer + "&source_amount=" + amount + "&destination_assets=" + destination);
-                    data = await response.json();
-                    console.log(data)
+        if (data && data._embedded && data._embedded.records) {
 
-                    if (data && data._embedded && data._embedded.records) {
-                        for (var r of data._embedded.records) {
-                            if (best.amount < parseFloat(r.destination_amount)) {
-                                best = {
-                                    amount: r.destination_amount,
-                                    path: r.path
-                                };
-                            }
-                        }
-                    }
-                } catch (e) {
-                    console.log(e)
+            // Probably the array is sorted and index 0 is the best
+            for (var r of data._embedded.records) {
+                if (best.amount < parseFloat(r.destination_amount)) {
+                    best = {
+                        amount: r.destination_amount,
+                        path: r.path,
+                        asset: asset
+                    };
                 }
-
-            }
-        } else {
-            try {
-                response = await fetch("https://horizon.stellar.org/paths/strict-send?source_asset_type=native&source_amount=" + amount + "&destination_assets=" + destination);
-                data = await response.json();
-                console.log(data)
-
-                if (data && data._embedded && data._embedded.records) {
-                    for (var r of data._embedded.records) {
-                        if (best.amount < parseFloat(r.destination_amount)) {
-                            best = {
-                                amount: r.destination_amount,
-                                path: r.path
-                            };
-                        }
-                    }
-                }
-            } catch (e) {
-                console.log(e)
             }
         }
+
     } catch (e) {
         console.log(e)
     }
@@ -392,16 +383,16 @@ async function findBestPath(asset, amount, destination = 'native') {
     return best;
 }
 
-async function getAveragePrice(asset) {
+async function getAveragePrice(asset, duration) {
     var asset = Utils.splitAsset(asset);
-    var diff = 21600000;
+    var diff = duration * 3600000;
     var end = new Date().getTime();
-    var start = end - 21600000;
+    var start = end - diff;
 
     console.log(start)
     console.log(end)
     try {
-        response = await fetch("https://horizon.stellar.org/trade_aggregations?base_asset_type=native&counter_asset_code="+asset.code+"&counter_asset_issuer="+asset.issuer+"&counter_asset_type=credit_alphanum4&resolution=3600000&start_time="+start+"&end_time="+end
+        response = await fetch("https://horizon.stellar.org/trade_aggregations?base_asset_type=native&counter_asset_code=" + asset.code + "&counter_asset_issuer=" + asset.issuer + "&counter_asset_type=credit_alphanum4&resolution=3600000&start_time=" + start + "&end_time=" + end
         );
         data = await response.json();
         console.log(data)
