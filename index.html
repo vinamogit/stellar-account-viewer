@@ -4,13 +4,14 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Page Title</title>
+    <title>Stellar Account Viewer</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' type='text/css' media='screen' href='css/slider.css'>
     <link rel='stylesheet' type='text/css' media='screen' href='css/main.css'>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-freighter-api/1.1.2/index.min.js"></script>
     <script src='./js/utils.js'></script>
     <script src='./js/freighter.js'></script>
+    <script src='./js/horizon-api.js'></script>
     <script src='./js/fast-toml.js'></script>
     <script src='./js/chart.min.js'></script>
 </head>
@@ -20,6 +21,8 @@
         <div id="side">
             <h3>Stellar Account Viewer</h3>
             <a href="#" class="menu">Balances</a>
+
+            <div id="callCount" style="position: fixed;bottom:2em;"></div>
         </div>
         <div id="main">
             <button style="vertical-align: bottom; " id="getPublicKey">
@@ -67,5 +70,10 @@
 </body>
 
 <script src='./js/balance.js'></script>
+<script>
+    setInterval((function () {
+        document.getElementById("callCount").innerHTML = "Horizon calls: " + Horizon.calls();
+    }), 1000);
+</script>
 
 </html>

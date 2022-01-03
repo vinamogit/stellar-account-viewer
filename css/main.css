@@ -147,3 +147,13 @@
             font-weight: lighter;
             font-size: smaller;
         }
+
+        .stellarexpert {
+            text-decoration: none;
+            color: inherit;
+        }
+        .stellarexpert:hover {
+            text-decoration: none;
+            color: inherit;
+            /* background-image: url('./images/stellar-expert-blue.svg'); */
+        }
