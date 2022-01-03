@@ -132,16 +132,21 @@
             color: #7d00ff;
             /* text-align: right; */
             text-decoration: none;
+            margin-top:2px;
         }
 
         .menu:hover {
             color: #7d00ff;
             text-decoration: none;
+            padding-left: 1em;
         }
 
         .tablecell {
             display: table-cell;
         }
+        /* .tablecell {
+            display: table-row;
+        } */
 
         .lighter {
             font-weight: lighter;
@@ -156,4 +161,8 @@
             text-decoration: none;
             color: inherit;
             /* background-image: url('./images/stellar-expert-blue.svg'); */
+        }
+
+        .lp {
+            width: 20%;
         }

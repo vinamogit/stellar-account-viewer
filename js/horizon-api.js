@@ -111,5 +111,13 @@ const Horizon = {
         let response = await fetch(this._getBaseUrl(network) + "trade_aggregations" + params);
         return response.json();
 
-    }
+    },
+
+    liquidityPools: async function (poolId, network = "PUBLIC") {
+        this._updateCallRate();
+
+        let response = await fetch(this._getBaseUrl(network) + "liquidity_pools/" + poolId);
+        return response.json();
+
+    },
 };

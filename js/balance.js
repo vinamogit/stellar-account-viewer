@@ -1,12 +1,9 @@
 
-const buttonPubKey = document.getElementById('getPublicKey');
-const fieldPubKey = document.getElementById('publicKey');
-const divBalances = document.getElementById('balanceWrapper');
 // const divClaimables = document.getElementById('claimablebalanceWrapper');
-const divCreation = document.getElementById('creation');
 // const inputNetwork = document.getElementById('network');
 // const spanNetwork = document.getElementById('networkName');
 
+const divCreation = document.getElementById('creation');
 // inputNetwork.checked = true;
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -15,52 +12,11 @@ if (accountId) {
     fieldPubKey.value = accountId;
     loadAccount(accountId);
 
-    var that = this;
-
-}
-
-buttonPubKey.addEventListener('mousedown', async () => {
-    if (freighter.isConnected()) {
-        console.log("User has Freighter!");
-
-        // let network = await retrieveNetwork();
-        let pubKey = await retrievePublicKey();
-        // console.log(network)
-        // console.log("click " + pubKey)
-        fieldPubKey.value = pubKey;
-        // inputNetwork.checked = (network == "PUBLIC");
-        // spanNetwork.innerHTML = network;
-        reload();
-    }
-});
-
-fieldPubKey.addEventListener('input', reload);
-
-function reload() {
-    if (validateAccount(fieldPubKey.value)) {
-        window.location = "?accountId=" + fieldPubKey.value;
-    }
-    if (fieldPubKey.value.length > 0) {
-        fieldPubKey.style['background-color'] = "red";
-    } else {
-        fieldPubKey.style['background-color'] = null;
+    var menu = document.getElementsByClassName("menu");
+    for (var m of menu) {
+        m.href += "?accountId=" + accountId;
     }
 }
-
-function validateAccount(pubKey) {
-    if (!pubKey.startsWith('G')) {
-        console.log("Key does not start with G");
-        return false;
-    }
-
-    if (pubKey.length != 56) {
-        console.log("Key size not correct " + pubKey.length)
-        return false;
-    }
-
-    return true;
-}
-
 
 async function loadAccount(pubKey) {
     let loading = document.getElementById("loading");
@@ -172,7 +128,7 @@ async function drawBalances(model) {
         let table = "";
         table += '<tr>';
         table += '<td rowspan="2">';
-        table += '<img class="asset-img" id="' + asset.code + ':' + asset.issuer + '"  src="' + image + '" />';
+        table += '<img class="asset-img ' + asset.code + ':' + asset.issuer + '"  src="' + image + '" />';
         table += '</td>';
         table += '<td>';
         table += Utils.formatAmount(balance.amount) + ' <span class="lighter">(' + Utils.formatAmount(balance.price, 2) + balance.currency + ')</span>';
@@ -298,56 +254,6 @@ function toggleOthers() {
     }
 }
 
-async function setAssetImage(code, issuer) {
-
-    var img = document.getElementById(code + ':' + issuer);
-    if (code) {
-        var image = await getAssetImage(code, issuer);
-        if (image) {
-            img.src = image;
-        }
-    } else {
-        img.src = "./images/stellar-xlm-logo.png";
-    }
-}
-
-/*
- * Get asset image from the stellar.toml of the home_domain
- */
-async function getAssetImage(code, issuer) {
-
-    async function fetchAssetImage(url) {
-        let response = await fetch(url, { mode: 'cors' });
-        let data = await response.text();
-        var t = TOML.parse(data);
-        if (t && t.CURRENCIES) {
-            for (var c of t.CURRENCIES) {
-                if (c.code == code && c.issuer) {
-                    return c.image;
-                }
-            }
-        }
-        return undefined;
-    }
-
-    let data = await Horizon.accounts(issuer);
-
-    let hd = data.home_domain;
-    if (hd) {
-        try {
-            return await fetchAssetImage("https://" + hd + "/.well-known/stellar.toml");
-        } catch (e) {
-            console.log("Failed to load asset image from HTTPS");
-            try {
-                return await fetchAssetImage("http://" + hd + "/.well-known/stellar.toml");
-            } catch (e) {
-                console.log("Failed to load asset image from HTTP");
-            }
-        }
-    }
-
-    return undefined;
-}
 
 async function findBestPath(asset, amount, destination = 'native') {
     amount = parseFloat(amount).toFixed(7);

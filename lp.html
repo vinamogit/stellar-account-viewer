@@ -21,7 +21,8 @@
         <div id="side">
             <h3>Stellar Account Viewer</h3>
             <a href="./index.html" class="menu">Balances</a>
-            <a href="./lp.html" class="menu">Liquidity Pools</a>
+            <a href="#" class="menu">Liquidity Pools</a>
+
             <div id="callCount" style="position: fixed;bottom:2em;"></div>
         </div>
         <div id="main">
@@ -32,45 +33,21 @@
                 <input style="height:2em; width: 38em;" type="text" id="publicKey"
                     placeholder="Paste your G... public key" />
             </span>
-            <!-- <label class="switch" >
-            <input type="checkbox" id="network">
-            <span class="slider round"></span>
-        </label>
-        <span id="networkName">PUBLIC</span> -->
-            <div id="creation"></div>
             <div id="balances">
-                <h2>Balances</h2>
+                <h2>Liquidity Pools</h2>
                 <div id="balanceWrapper">
-                    <div id="loading" ></div>
-                    <div class="tablecell" style="text-align:left;vertical-align: middle;">
-                        <table id="nativeBalance" style="text-align:left;vertical-align: middle;" class="tablecell">
-                        </table>
-                        <table id="idTableOthers" style="text-align:left">
-                    </table>
-                </div>
-                    <div class="chart-container tablecell" >
-                        <canvas id="chart" ></canvas>
-                    </div>
-                    <!-- <h3>
-                        <a href="#" onclick="toggleOthers()" style="display:block;text-decoration:none;color:inherit">
-                            <span id="toggle">►</span> Others (<span id="othersCount"></span>)</a>
-                    </h3> -->
-
+                    <div id="loading"></div>
+                    <div id="pools"></div>
                 </div>
                 <div style="clear: both"></div>
             </div>
-            <!-- <div id="claimablebalances">
-            <h2>Claimable Balances</h2>
-            <div id="claimablebalanceWrapper"></div>
-            <div style="clear: both"></div>
-        </div> -->
         </div>
 
     </div>
 </body>
 
 <script src='./js/common.js'></script>
-<script src='./js/balance.js'></script>
+<script src='./js/lp.js'></script>
 <script>
     setInterval((function () {
         document.getElementById("callCount").innerHTML = "Horizon calls: " + Horizon.calls();
