@@ -1,22 +1,23 @@
-
-// const divClaimables = document.getElementById('claimablebalanceWrapper');
-// const inputNetwork = document.getElementById('network');
-// const spanNetwork = document.getElementById('networkName');
+/*
+ *
+ * ASSETS / BALANCES
+ * 
+ */
 
 const divCreation = document.getElementById('creation');
-// inputNetwork.checked = true;
-
-const urlParams = new URLSearchParams(window.location.search);
-let accountId = urlParams.get('accountId');
+var urlParams = new URLSearchParams(window.location.search);
+const accountId = urlParams.get('accountId');
 if (accountId) {
     fieldPubKey.value = accountId;
     loadAccount(accountId);
 
     var menu = document.getElementsByClassName("menu");
     for (var m of menu) {
-        m.href += "?accountId=" + accountId;
+        m.href += "?accountId=" + accountId + "&network=" + Horizon.network;
     }
 }
+
+
 
 async function loadAccount(pubKey) {
     let loading = document.getElementById("loading");
@@ -190,55 +191,57 @@ async function drawBalances(model) {
 
     divCreation.innerHTML = createdAt;
 
-    /*
-     * Chart
-     */
-    const data = {
-        labels: chartLabels,
-        datasets: [
-            {
-                label: 'Price',
-                data: chartData,
-                cutout: "70%",
-                backgroundColor: [
-                    '#7d00ff', // Stellar Violet
-                    '#ffa51e', // Stellar Yolk  
-                    '#00aa46', // Stellar Moss  
-                    '#ff5500', // Stellar Ochre 
-                    '#000000', // Stellar Coal  
-                    '#e1e1e1', // Stellar Cloud 
-                    '#4dc9f6',
-                    '#f67019',
-                    '#f53794',
-                    '#537bc4',
-                    '#acc236',
-                    '#166a8f',
-                    '#00a950',
-                    '#58595b',
-                    '#8549ba'
-                ]
-            }
-        ]
-    };
-    var ctx = 'chart';
-    const config = {
-        type: 'doughnut',
-        data: data,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'right',
-                    display: false,
-                },
-                title: {
-                    display: true,
-                    text: Utils.formatAmount(model.evaluation, 2) + model.native.currency
+    if (model.evaluation > 0) {
+        /*
+         * Chart
+         */
+        const data = {
+            labels: chartLabels,
+            datasets: [
+                {
+                    label: 'Price',
+                    data: chartData,
+                    cutout: "70%",
+                    backgroundColor: [
+                        '#7d00ff', // Stellar Violet
+                        '#ffa51e', // Stellar Yolk  
+                        '#00aa46', // Stellar Moss  
+                        '#ff5500', // Stellar Ochre 
+                        '#000000', // Stellar Coal  
+                        '#e1e1e1', // Stellar Cloud 
+                        '#4dc9f6',
+                        '#f67019',
+                        '#f53794',
+                        '#537bc4',
+                        '#acc236',
+                        '#166a8f',
+                        '#00a950',
+                        '#58595b',
+                        '#8549ba'
+                    ]
                 }
-            }
-        },
-    };
-    var myChart = new Chart(ctx, config);
+            ]
+        };
+        var ctx = 'chart';
+        const config = {
+            type: 'doughnut',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: Utils.formatAmount(model.evaluation, 2) + model.native.currency
+                    }
+                }
+            },
+        };
+        new Chart(ctx, config);
+    }
 }
 
 

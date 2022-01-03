@@ -2,27 +2,47 @@
 
 const buttonPubKey = document.getElementById('getPublicKey');
 const fieldPubKey = document.getElementById('publicKey');
+const inputNetwork = document.getElementById('network');
+const spanNetwork = document.getElementById('networkName');
+
+var urlParams = new URLSearchParams(window.location.search);
+
+var network = urlParams.get('network');
+network = network?network:"PUBLIC";
+Horizon.network = network;
+inputNetwork.checked = (network == "PUBLIC");
+spanNetwork.value = network;
 
 buttonPubKey.addEventListener('mousedown', async () => {
     if (freighter.isConnected()) {
         console.log("User has Freighter!");
 
-        // let network = await retrieveNetwork();
+        let network = await retrieveNetwork();
         let pubKey = await retrievePublicKey();
         // console.log(network)
         // console.log("click " + pubKey)
         fieldPubKey.value = pubKey;
-        // inputNetwork.checked = (network == "PUBLIC");
-        // spanNetwork.innerHTML = network;
+        inputNetwork.checked = (network == "PUBLIC");
+        spanNetwork.innerHTML = network;
         reload();
     }
 });
 
 fieldPubKey.addEventListener('input', reload);
 
+inputNetwork.addEventListener('input', value => {
+    console.log(inputNetwork.checked)
+    if (inputNetwork.checked) {
+        spanNetwork.innerHTML = "PUBLIC";
+    } else {
+        spanNetwork.innerHTML = "TESTNET";
+    }
+    reload();
+});
+
 function reload() {
     if (validateAccount(fieldPubKey.value)) {
-        window.location = "?accountId=" + fieldPubKey.value;
+        window.location = "?accountId=" + fieldPubKey.value + "&network=" + spanNetwork.innerHTML;
     }
     if (fieldPubKey.value.length > 0) {
         fieldPubKey.style['background-color'] = "red";

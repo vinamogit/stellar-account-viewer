@@ -2,6 +2,8 @@
 var that = this;
 const Horizon = {
 
+    network: "PUBLIC",
+
     calls: function () {
         return localStorage.getItem("callscount");
     },
@@ -39,21 +41,21 @@ const Horizon = {
         return "https://horizon-testnet.stellar.org/";
     },
 
-    accounts: async function (pubKey, network = "PUBLIC") {
+    accounts: async function (pubKey) {
         this._updateCallRate();
         let response = await fetch(this._getBaseUrl(network) + "accounts/" + pubKey);
         return response.json();
 
     },
 
-    operations: async function (pubKey, network = "PUBLIC") {
+    operations: async function (pubKey) {
         this._updateCallRate();
         let response = await fetch(this._getBaseUrl(network) + "accounts/" + pubKey + '/operations');
         return response.json();
 
     },
 
-    assets: async function (code, issuer, limit = 1, network = "PUBLIC") {
+    assets: async function (code, issuer, limit = 1) {
         this._updateCallRate();
 
         var params = "?limit=" + limit;
@@ -69,7 +71,7 @@ const Horizon = {
 
     },
 
-    strictSend: async function (type, code, issuer, destination, amount, network = "PUBLIC") {
+    strictSend: async function (type, code, issuer, destination, amount) {
         this._updateCallRate();
 
         var params = "?source_asset_type=" + type;
@@ -87,7 +89,7 @@ const Horizon = {
 
     },
 
-    trade_aggregations: async function(base, counter, resolution, start, end, network = "PUBLIC") {
+    trade_aggregations: async function(base, counter, resolution, start, end) {
         this._updateCallRate();
 
         var params = "?base_asset_type=" + base.type;
@@ -113,7 +115,7 @@ const Horizon = {
 
     },
 
-    liquidityPools: async function (poolId, network = "PUBLIC") {
+    liquidityPools: async function (poolId) {
         this._updateCallRate();
 
         let response = await fetch(this._getBaseUrl(network) + "liquidity_pools/" + poolId);

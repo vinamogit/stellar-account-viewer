@@ -1,5 +1,11 @@
+/*
+ *
+ * LIQUIDITY POOLS
+ * 
+ */
 
-const urlParams = new URLSearchParams(window.location.search);
+
+var urlParams = new URLSearchParams(window.location.search);
 let accountId = urlParams.get('accountId');
 if (accountId) {
     fieldPubKey.value = accountId;
@@ -7,7 +13,7 @@ if (accountId) {
 
     var menu = document.getElementsByClassName("menu");
     for (var m of menu) {
-        m.href += "?accountId=" + accountId;
+        m.href += "?accountId=" + accountId + "&network=" + Horizon.network;
     }
 }
 
@@ -79,66 +85,55 @@ async function loadLiquidityPools(pubKey) {
 
 async function drawLiquidityPool(model) {
 
-    // if (model.native) {
-    //     let table = await draw({ code: "XLM", issuer: "" }, "./images/stellar-xlm-logo.png", model.native);
-    //     document.getElementById("nativeBalance").innerHTML = table;
-
-    //     // Chart data
-    //     chartLabels.push("XLM");
-    //     chartData.push(model.native.price);
-    // }
-
     const defaultImage = "./images/generic.png";
     let table = "";
     let assets = [];
-    for (var poolid of model.pools) {
-        let pool = model[poolid];
-        let amount1 = pool.share[0].amount;
-        let amount2 = pool.share[1].amount;
-        if (!assets.includes(pool.share[0].asset)) {
-            assets.push(pool.share[0].asset);
+    if (model.pools.length > 0) {
+        for (var poolid of model.pools) {
+            let pool = model[poolid];
+            let amount1 = pool.share[0].amount;
+            let amount2 = pool.share[1].amount;
+            if (!assets.includes(pool.share[0].asset)) {
+                assets.push(pool.share[0].asset);
+            }
+            if (!assets.includes(pool.share[1].asset)) {
+                assets.push(pool.share[1].asset);
+            }
+            let asset1 = Utils.splitAsset(pool.share[0].asset);
+            let asset2 = Utils.splitAsset(pool.share[1].asset);
+            let label1 = (asset1.code == "native") ? "XLM" : asset1.code;
+            let label2 = (asset2.code == "native") ? "XLM" : asset2.code;
+
+            table += '<div class="tablerow" style="text-align:left;vertical-align: middle;">';
+            table += '<div class="tablecell" style="text-align:left;vertical-align: middle;">';
+            table += '  <table class="lp" >';
+            table += '    <tr>';
+            table += '      <td style="text-align: right;min-width:10em;">';
+            table += '        ' + Utils.formatAmount(amount1);
+            table += '      </td>';
+            table += '      <td rowspan="2" style="text-align: right;" >';
+            table += '        <img class="asset-img ' + asset1.code + ':' + asset1.issuer + '"  src="' + defaultImage + '" />';
+            table += '      </td>';
+            table += '      <td rowspan="2">';
+            table += '        <img class="asset-img ' + asset2.code + ':' + asset2.issuer + '"  src="' + defaultImage + '" />';
+            table += '      </td>';
+            table += '      <td style="text-align: left;min-width:10em;">';
+            table += '        ' + Utils.formatAmount(amount2);
+            table += '      </td>';
+            table += '    </tr>';
+            table += '    <tr>';
+            table += '      <td class="lighter" style="text-align: right;">' + label1 + '</td>';
+            table += '      <td class="lighter">' + label2 + '</td>';
+            table += '    </tr>';
+            table += '  </table>';
+            table += '</div>';
+            table += '<div class="chart-container tablecell" > <canvas style="width: 50%;text-align: right;"  id="chart' + poolid + '"></canvas> </div>';
+            table += '</div>';
+
+
         }
-        if (!assets.includes(pool.share[1].asset)) {
-            assets.push(pool.share[1].asset);
-        }
-        let asset1 = Utils.splitAsset(pool.share[0].asset);
-        let asset2 = Utils.splitAsset(pool.share[1].asset);
-        let label1 = (asset1.code == "native")?"XLM":asset1.code;
-        let label2 = (asset2.code == "native")?"XLM":asset2.code;
-
-        table += '<div class="tablerow" style="text-align:left;vertical-align: middle;">';
-        table += '<div class="tablecell" style="text-align:left;vertical-align: middle;">';
-        table += '  <table class="lp" >';
-        table += '    <tr>';
-        table += '      <td style="text-align: right;min-width:10em;">';
-        table += '        ' + Utils.formatAmount(amount1);
-        table += '      </td>';
-        table += '      <td rowspan="2" style="text-align: right;" >';
-        table += '        <img class="asset-img ' + asset1.code + ':' + asset1.issuer + '"  src="' + defaultImage + '" />';
-        table += '      </td>';
-        table += '      <td rowspan="2">';
-        table += '        <img class="asset-img ' + asset2.code + ':' + asset2.issuer + '"  src="' + defaultImage + '" />';
-        table += '      </td>';
-        table += '      <td style="text-align: left;min-width:10em;">';
-        table += '        ' + Utils.formatAmount(amount2);
-        table += '      </td>';
-        // table += '      <td rowspan="3"> ';
-        // table += '<canvas style="width: 80%;text-align: right;"  id="chart' + poolid + '"></canvas> ';
-        // table += '      </td>';
-        table += '    </tr>';
-    
-        table += '    <tr>';
-        table += '      <td class="lighter" style="text-align: right;">' + label1 + '</td>';
-        table += '      <td class="lighter">' + label2 + '</td>';
-        // table += '      <td class="lighter">' + label2 + '</td>';
-        table += '    </tr>';
-        table += '  </table>';
-        table += '</div>';
-        table += '<div class="chart-container tablecell" > <canvas style="width: 50%;text-align: right;"  id="chart' + poolid + '"></canvas> </div>';
-        table += '</div>';
 
 
-    }
     document.getElementById('pools').innerHTML = table;
 
     for (var asset of assets) {
@@ -156,8 +151,8 @@ async function drawLiquidityPool(model) {
         let amount2 = pool.share[1].amount;
         let asset1 = Utils.splitAsset(pool.share[0].asset);
         let asset2 = Utils.splitAsset(pool.share[1].asset);
-        let label1 = (asset1.code == "native")?"XLM":asset1.code;
-        let label2 = (asset2.code == "native")?"XLM":asset2.code;
+        let label1 = (asset1.code == "native") ? "XLM" : asset1.code;
+        let label2 = (asset2.code == "native") ? "XLM" : asset2.code;
 
         var chartData = [amount1, amount2];
         var chartLabels = [label1, label2];
@@ -208,6 +203,10 @@ async function drawLiquidityPool(model) {
             },
         };
         new Chart(ctx, config);
+    }
+
+    } else {
+        document.getElementById('pools').innerHTML = "No liquidity pools";
     }
 
 }
