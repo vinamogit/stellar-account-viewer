@@ -122,4 +122,11 @@ const Horizon = {
         return response.json();
 
     },
+
+    claimableBalances: async function (pubKey) {
+        this._updateCallRate();
+
+        let response = await fetch(this._getBaseUrl(network) + "claimable_balances?claimant=" + pubKey);
+        return response.json();
+    }
 };

@@ -166,3 +166,23 @@
         .lp {
             width: 20%;
         }
+
+        .button-green {
+            background-color: #00aa46;
+            border: 0px;
+            border-radius: 4px;
+            height: 2em;
+            cursor: pointer;
+        }
+        .button-red {
+            background-color: #ffa51e;
+            border: 0px;
+            border-radius: 4px;
+            height: 2em;
+            cursor: pointer;
+        }
+
+        .claim tr td:last-child {
+            width: 1%;
+            white-space: nowrap;
+        }

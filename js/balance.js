@@ -258,47 +258,6 @@ function toggleOthers() {
 }
 
 
-async function findBestPath(asset, amount, destination = 'native') {
-    amount = parseFloat(amount).toFixed(7);
-
-    var best = {
-        amount: 0,
-        path: [],
-        asset: {}
-    }
-
-    var asset = Utils.splitAsset(asset);
-
-    let type = "native";
-    if (asset.code != "native") {
-        let data = await Horizon.assets(asset.code, asset.issuer);
-        if (data && data._embedded && data._embedded.records && data._embedded.records.length > 0) {
-            type = data._embedded.records[0].asset_type;
-        }
-    }
-
-    try {
-        data = await Horizon.strictSend(type, (asset.code == "native") ? undefined : asset.code, asset.issuer, destination, amount);
-        if (data && data._embedded && data._embedded.records) {
-
-            // Probably the array is sorted and index 0 is the best
-            for (var r of data._embedded.records) {
-                if (best.amount < parseFloat(r.destination_amount)) {
-                    best = {
-                        amount: r.destination_amount,
-                        path: r.path,
-                        asset: asset
-                    };
-                }
-            }
-        }
-
-    } catch (e) {
-        console.log(e)
-    }
-
-    return best;
-}
 
 async function getAveragePrice(fromasset, toasset, duration) {
     // var toasset = Utils.splitAsset(toasset);

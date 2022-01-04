@@ -39,13 +39,11 @@
                 <span class="slider round"></span>
             </label>
             <span id="networkName">PUBLIC</span>
-
-            <div id="balances">
-                <h2>Liquidity Pools</h2>
-                <div id="balanceWrapper">
-                    <div id="loading"></div>
-                    <div id="pools"></div>
-                </div>
+            
+            <div id="claimablebalances">
+                <h2>Claimable Balances</h2>
+                <div id="loading"></div>
+                <div id="claimablebalanceWrapper"></div>
                 <div style="clear: both"></div>
             </div>
         </div>
@@ -54,7 +52,7 @@
 </body>
 
 <script src='./js/common.js'></script>
-<script src='./js/lp.js'></script>
+<script src='./js/claimable.js'></script>
 <script>
     setInterval((function () {
         document.getElementById("callCount").innerHTML = "Horizon calls: " + Horizon.calls();
