@@ -11,7 +11,7 @@ var network = urlParams.get('network');
 network = network?network:"PUBLIC";
 Horizon.network = network;
 inputNetwork.checked = (network == "PUBLIC");
-spanNetwork.value = network;
+spanNetwork.innerHTML = network;
 
 buttonPubKey.addEventListener('mousedown', async () => {
     if (freighter.isConnected()) {
