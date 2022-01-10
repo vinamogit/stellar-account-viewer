@@ -15,16 +15,15 @@ spanNetwork.innerHTML = network;
 
 buttonPubKey.addEventListener('mousedown', async () => {
     if (freighter.isConnected()) {
-        console.log("User has Freighter!");
 
         let network = await retrieveNetwork();
         let pubKey = await retrievePublicKey();
-        // console.log(network)
-        // console.log("click " + pubKey)
         fieldPubKey.value = pubKey;
         inputNetwork.checked = (network == "PUBLIC");
         spanNetwork.innerHTML = network;
         reload();
+    }else {
+        document.getElementById("noFreighter").style="display: inline-block";
     }
 });
 
